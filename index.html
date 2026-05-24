@@ -1117,6 +1117,106 @@
     #invoice-print { position: fixed; top: 0; left: 0; width: 100%; }
   }
 
+  /* ── DASHBOARD TWO-COL ── */
+  .dashboard-body {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 28px;
+    align-items: start;
+  }
+
+  .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+  .panel-card {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .panel-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-card-title {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .panel-card-count {
+    font-size: 10px;
+    color: rgba(245,240,232,0.25);
+    letter-spacing: 1px;
+  }
+
+  .panel-item {
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(196,160,82,0.06);
+    transition: background 0.2s;
+  }
+
+  .panel-item:last-child { border-bottom: none; }
+  .panel-item:hover { background: rgba(196,160,82,0.04); }
+
+  .panel-item-name {
+    font-size: 13px;
+    color: var(--cream);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+
+  .panel-item-meta {
+    font-size: 10px;
+    color: rgba(245,240,232,0.35);
+    letter-spacing: 0.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .panel-item-amt {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    color: #e07070;
+  }
+
+  .panel-empty {
+    padding: 28px 20px;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(245,240,232,0.18);
+    letter-spacing: 1.5px;
+    font-style: italic;
+  }
+
+  .days-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    border: 1px solid;
+  }
+
+  .days-chip.soon { color: #e07070; border-color: rgba(224,112,112,0.3); background: rgba(224,112,112,0.08); }
+  .days-chip.upcoming { color: var(--gold); border-color: rgba(196,160,82,0.3); background: rgba(196,160,82,0.07); }
+  .days-chip.future { color: rgba(245,240,232,0.3); border-color: rgba(245,240,232,0.1); background: transparent; }
+
+  .month-bar-wrap { padding: 16px 20px; }
+  .month-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .month-bar-label { font-size: 10px; color: rgba(245,240,232,0.35); letter-spacing: 1px; width: 32px; text-align: right; flex-shrink: 0; }
+  .month-bar-track { flex: 1; height: 4px; background: rgba(196,160,82,0.1); }
+  .month-bar-fill { height: 100%; background: var(--gold); transition: width 0.6s ease; }
+  .month-bar-val { font-size: 10px; color: rgba(245,240,232,0.4); letter-spacing: 0.5px; width: 70px; text-align: right; flex-shrink: 0; }
+
   /* Google Sign-In button */
   .btn-google {
     width: 100%;
@@ -1277,25 +1377,62 @@
           </div>
         </div>
 
-        <div class="section-header">
-          <div class="section-title">Recent Invoices</div>
-          <button class="btn-gold" onclick="showView('new-invoice', document.querySelector('[data-view=new-invoice]'))">+ New Invoice</button>
-        </div>
+        <div class="dashboard-body">
 
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Invoice No.</th>
-              <th>Client</th>
-              <th>Event</th>
-              <th>Date</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="dashboard-table-body"></tbody>
-        </table>
+          <!-- LEFT: Recent Invoices -->
+          <div>
+            <div class="section-header">
+              <div class="section-title">Recent Invoices</div>
+              <button class="btn-gold" onclick="showView('new-invoice', document.querySelector('[data-view=new-invoice]'))">+ New Invoice</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice No.</th>
+                  <th>Client</th>
+                  <th>Event</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- RIGHT: Sidebar panels -->
+          <div class="right-panel">
+
+            <!-- Upcoming Shoots -->
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-title">Upcoming Shoots</div>
+                <div class="panel-card-count" id="upcoming-count"></div>
+              </div>
+              <div id="upcoming-list"><div class="panel-empty">No upcoming events</div></div>
+            </div>
+
+            <!-- Pending Balances -->
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-title">Pending Balances</div>
+                <div class="panel-card-count" id="pending-count"></div>
+              </div>
+              <div id="pending-list"><div class="panel-empty">All settled up</div></div>
+            </div>
+
+            <!-- Monthly Revenue -->
+            <div class="panel-card">
+              <div class="panel-card-header">
+                <div class="panel-card-title">Monthly Revenue</div>
+                <div class="panel-card-count" id="monthly-label"></div>
+              </div>
+              <div class="month-bar-wrap" id="monthly-bars"></div>
+            </div>
+
+          </div>
+        </div>
       </div>
 
       <!-- NEW INVOICE VIEW -->
@@ -1992,17 +2129,128 @@ function renderDashboard() {
   document.getElementById('stat-advance').textContent = `Rs ${fmtNum(advance)}`;
   document.getElementById('stat-balance').textContent = `Rs ${fmtNum(balance)}`;
 
+  // Recent invoices (left column, max 5)
   const tbody = document.getElementById('dashboard-table-body');
   tbody.innerHTML = '';
-  const recent = invs.slice(0, 8);
+  const recent = invs.slice(0, 5);
   if (recent.length === 0) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:40px; color:rgba(245,240,232,0.2); font-style:italic; letter-spacing:2px; font-size:12px;">No invoices yet — create your first one</td></tr>`;
-    return;
+  } else {
+    recent.forEach(inv => { tbody.appendChild(buildInvoiceRow(inv)); });
   }
-  recent.forEach(inv => {
-    const tr = buildInvoiceRow(inv);
-    tbody.appendChild(tr);
+
+  // ── UPCOMING SHOOTS ──────────────────────────────────────────
+  const today = new Date(); today.setHours(0,0,0,0);
+  const in30 = new Date(today); in30.setDate(today.getDate() + 60);
+
+  const upcoming = [];
+  invs.forEach(inv => {
+    const dates = inv.eventDates && inv.eventDates.length ? inv.eventDates : [];
+    dates.forEach(ed => {
+      if (!ed.tbd && ed.date && ed.date !== 'TBD') {
+        const d = new Date(ed.date); d.setHours(0,0,0,0);
+        if (d >= today) upcoming.push({ inv, date: d, label: ed.label });
+      }
+    });
+    // fallback for old format
+    if (!dates.length && inv.eventStart) {
+      const d = new Date(inv.eventStart); d.setHours(0,0,0,0);
+      if (d >= today) upcoming.push({ inv, date: d, label: '' });
+    }
   });
+  upcoming.sort((a, b) => a.date - b.date);
+  const upcomingTop = upcoming.slice(0, 5);
+
+  const upcomingList = document.getElementById('upcoming-list');
+  const upcomingCount = document.getElementById('upcoming-count');
+  upcomingCount.textContent = upcoming.length ? `${upcoming.length} shoot${upcoming.length > 1 ? 's' : ''}` : '';
+
+  if (upcomingTop.length === 0) {
+    upcomingList.innerHTML = `<div class="panel-empty">No upcoming events</div>`;
+  } else {
+    upcomingList.innerHTML = upcomingTop.map(({ inv, date, label }) => {
+      const diffDays = Math.round((date - today) / 86400000);
+      let chipClass = diffDays <= 7 ? 'soon' : diffDays <= 21 ? 'upcoming' : 'future';
+      let chipText = diffDays === 0 ? 'Today' : diffDays === 1 ? 'Tomorrow' : `${diffDays}d`;
+      const dateStr = date.toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+      const sublabel = label ? label : (inv.eventType || '—');
+      return `<div class="panel-item" onclick="openInvoicePreview(${JSON.stringify(inv.id).replace(/"/g,'&quot;')})" style="cursor:pointer;">
+        <div class="panel-item-name">${inv.clientName || '—'}</div>
+        <div class="panel-item-meta">
+          <span>${sublabel} · ${dateStr}</span>
+          <span class="days-chip ${chipClass}">${chipText}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── PENDING BALANCES ──────────────────────────────────────────
+  const pending = invs.filter(i => (i.balance || 0) > 0 && i.status !== 'Paid')
+    .sort((a, b) => (b.balance || 0) - (a.balance || 0))
+    .slice(0, 5);
+
+  const pendingList = document.getElementById('pending-list');
+  const pendingCount = document.getElementById('pending-count');
+  const totalPending = invs.filter(i => (i.balance || 0) > 0 && i.status !== 'Paid')
+    .reduce((s, i) => s + (i.balance || 0), 0);
+  pendingCount.textContent = totalPending ? `Rs ${fmtNum(totalPending)}` : '';
+
+  if (pending.length === 0) {
+    pendingList.innerHTML = `<div class="panel-empty">All settled up</div>`;
+  } else {
+    pendingList.innerHTML = pending.map(inv => {
+      const statusClass = inv.status === 'Partial' ? 'status-partial' : 'status-pending';
+      return `<div class="panel-item" onclick="openInvoicePreview(${JSON.stringify(inv.id).replace(/"/g,'&quot;')})" style="cursor:pointer;">
+        <div class="panel-item-name">${inv.clientName || '—'}</div>
+        <div class="panel-item-meta">
+          <span>${inv.invNo || ''} · ${inv.eventType || '—'}</span>
+          <span class="panel-item-amt">Rs ${fmtNum(inv.balance)}</span>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── MONTHLY REVENUE BARS ─────────────────────────────────────
+  const monthlyMap = {};
+  invs.forEach(inv => {
+    if (!inv.invDate) return;
+    const key = inv.invDate.slice(0, 7); // YYYY-MM
+    monthlyMap[key] = (monthlyMap[key] || 0) + (inv.total || 0);
+  });
+
+  // Get last 5 months
+  const months = [];
+  for (let i = 4; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const key = d.toISOString().slice(0, 7);
+    const label = d.toLocaleDateString('en-GB', { month: 'short' });
+    months.push({ key, label, val: monthlyMap[key] || 0 });
+  }
+
+  const maxVal = Math.max(...months.map(m => m.val), 1);
+  const barsEl = document.getElementById('monthly-bars');
+  const monthlyLabel = document.getElementById('monthly-label');
+  const thisMonthKey = today.toISOString().slice(0, 7);
+  const thisMonth = monthlyMap[thisMonthKey] || 0;
+  monthlyLabel.textContent = thisMonth ? `Rs ${fmtNum(thisMonth)} this month` : '';
+
+  if (months.every(m => m.val === 0)) {
+    barsEl.innerHTML = `<div class="panel-empty" style="padding:20px 0;">No invoices yet</div>`;
+  } else {
+    barsEl.innerHTML = months.map(m => `
+      <div class="month-bar-row">
+        <div class="month-bar-label">${m.label}</div>
+        <div class="month-bar-track">
+          <div class="month-bar-fill" style="width:${Math.round((m.val / maxVal) * 100)}%;${m.key === thisMonthKey ? 'background:var(--gold);' : 'background:rgba(196,160,82,0.4);'}"></div>
+        </div>
+        <div class="month-bar-val">${m.val ? 'Rs ' + fmtNum(m.val) : '—'}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function openInvoicePreview(id) {
+  viewInvoice(id);
 }
 
 // ─── RENDER INVOICE LIST ─────────────────────────────────────────
