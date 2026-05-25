@@ -1766,8 +1766,8 @@ function initApp() {
   renderDashboard();
 }
 
-function autoInvoiceNo() {
-  const invs = getInvoices();
+async function autoInvoiceNo() {
+  const invs = await getInvoices();
   const nextNum = (invs.length + 1).toString().padStart(4, '0');
   document.getElementById('f-inv-no').value = `FF-${nextNum}`;
 }
@@ -2074,12 +2074,12 @@ function collectFormData() {
 // ─── SAVE ───────────────────────────────────────────────────────
 let editingId = null;
 
-function saveInvoice() {
+async function saveInvoice() {
   const data = collectFormData();
   if (!data.clientName) { showToast('⚠ Please enter client name'); return; }
   if (!data.invNo) { showToast('⚠ Please enter invoice number'); return; }
 
-  const invs = getInvoices();
+  const invs = await getInvoices();
 
   if (editingId !== null) {
     const idx = invs.findIndex(i => i.id === editingId);
@@ -2089,7 +2089,7 @@ function saveInvoice() {
     invs.unshift(data);
   }
 
-  saveInvoices(invs);
+  await saveInvoiceToDb(data);
   showToast('✓ Invoice saved successfully');
   resetForm();
   showView('invoices', document.querySelector('[data-view=invoices]'));
@@ -2123,8 +2123,8 @@ function resetForm() {
 }
 
 // ─── RENDER DASHBOARD ───────────────────────────────────────────
-function renderDashboard() {
-  const invs = getInvoices();
+async function renderDashboard() {
+  const invs = await getInvoices();
   const total = invs.length;
   const revenue = invs.reduce((s, i) => s + (i.total || 0), 0);
   const advance = invs.reduce((s, i) => s + (i.advance || 0), 0);
@@ -2260,10 +2260,10 @@ function openInvoicePreview(id) {
 }
 
 // ─── RENDER INVOICE LIST ─────────────────────────────────────────
-function renderInvoiceList() {
+async function renderInvoiceList() {
   const search = (document.getElementById('search-input')?.value || '').toLowerCase();
   const statusFilter = document.getElementById('filter-status')?.value || '';
-  let invs = getInvoices();
+  let invs = await getInvoices();
 
   if (search) invs = invs.filter(i =>
     (i.clientName || '').toLowerCase().includes(search) ||
@@ -2334,17 +2334,20 @@ function buildInvoiceRow(inv, full = false) {
   return tr;
 }
 
-function updateStatus(id, status) {
-  const invs = getInvoices();
+async function updateStatus(id, status) {
+  const invs = await getInvoices();
   const idx = invs.findIndex(i => i.id === id);
-  if (idx > -1) { invs[idx].status = status; saveInvoices(invs); }
+  if (idx > -1) {
+    invs[idx].status = status;
+    await saveInvoiceToDb(invs[idx]);
+  }
   renderDashboard();
   showToast(`Status updated to ${status}`);
 }
 
 // ─── CLIENTS VIEW ───────────────────────────────────────────────
-function renderClients() {
-  const invs = getInvoices();
+async function renderClients() {
+  const invs = await getInvoices();
   const map = {};
   invs.forEach(inv => {
     const key = (inv.clientName || '').toLowerCase();
@@ -2379,8 +2382,8 @@ function renderClients() {
 }
 
 // ─── EDIT ───────────────────────────────────────────────────────
-function editInvoice(id) {
-  const invs = getInvoices();
+async function editInvoice(id) {
+  const invs = await getInvoices();
   const inv = invs.find(i => i.id === id);
   if (!inv) return;
 
@@ -2455,10 +2458,9 @@ function closeConfirm() {
   document.getElementById('confirm-modal').classList.remove('open');
 }
 
-function confirmDelete() {
+async function confirmDelete() {
   if (deleteTarget === null) return;
-  const invs = getInvoices().filter(i => i.id !== deleteTarget);
-  saveInvoices(invs);
+  await deleteInvoiceFromDb(deleteTarget);
   closeConfirm();
   renderInvoiceList();
   renderDashboard();
@@ -2474,8 +2476,8 @@ function previewInvoice() {
   document.getElementById('preview-modal').classList.add('open');
 }
 
-function viewInvoice(id) {
-  const invs = getInvoices();
+async function viewInvoice(id) {
+  const invs = await getInvoices();
   previewData = invs.find(i => i.id === id);
   if (!previewData) return;
   renderInvoicePrint(previewData);
@@ -2623,7 +2625,7 @@ function renderInvoicePrint(d) {
 
 // ─── QUICK PDF DOWNLOAD (from invoice list, no modal) ────────────
 async function quickDownloadPDF(id) {
-  const invs = getInvoices();
+  const invs = await getInvoices();
   const inv = invs.find(i => i.id === id);
   if (!inv) { showToast('Invoice not found'); return; }
 
