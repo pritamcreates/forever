@@ -739,21 +739,22 @@
   #invoice-print, #invoice-render-sandbox {
     background: #fff;
     color: #1a1510;
-    padding: 50px;
+    padding: 38px 44px;
     font-family: 'Jost', sans-serif;
     max-width: 860px;
+    box-sizing: border-box;
   }
 
   .inv-header {
     display: flex; justify-content: space-between; align-items: flex-start;
-    padding-bottom: 30px;
+    padding-bottom: 16px;
     border-bottom: 2px solid #1a1510;
-    margin-bottom: 30px;
+    margin-bottom: 18px;
   }
 
   .inv-brand .wordmark {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 38px;
+    font-size: 34px;
     font-style: italic;
     font-weight: 300;
     color: #1a1510;
@@ -762,7 +763,7 @@
 
   .inv-brand .tag {
     font-size: 8px;
-    letter-spacing: 5px;
+    letter-spacing: 4px;
     text-transform: uppercase;
     color: #8B1A1A;
     margin-top: 4px;
@@ -770,10 +771,10 @@
   }
 
   .inv-brand .contact {
-    font-size: 11px;
+    font-size: 10.5px;
     color: #5a4a3a;
-    margin-top: 12px;
-    line-height: 1.7;
+    margin-top: 8px;
+    line-height: 1.6;
     font-weight: 300;
   }
 
@@ -781,47 +782,65 @@
 
   .inv-meta .inv-no {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
+    font-size: 26px;
     color: #8B1A1A;
-    font-weight: 300;
+    font-weight: 400;
+    letter-spacing: 1px;
   }
 
-  .inv-meta table { margin-left: auto; margin-top: 8px; }
+  .inv-meta table { margin-left: auto; margin-top: 6px; }
 
   .inv-meta table td {
-    font-size: 11px;
+    font-size: 10.5px;
     color: #5a4a3a;
-    padding: 2px 0 2px 20px;
+    padding: 2px 0 2px 14px;
   }
 
-  .inv-meta table td:first-child { color: #1a1510; font-weight: 500; letter-spacing: 1px; }
+  .inv-meta table td:first-child {
+    color: #1a1510;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: right;
+  }
+  .inv-meta table td:last-child {
+    text-align: right;
+  }
 
   .inv-body-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin-bottom: 30px;
+    gap: 20px;
+    margin-bottom: 18px;
   }
 
   .inv-section-label {
-    font-size: 8px;
-    letter-spacing: 0;
+    font-size: 7.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: #8B1A1A;
-    margin-bottom: 10px;
-    font-weight: 500;
+    margin-bottom: 5px;
+    font-weight: 600;
   }
 
   .inv-section-content {
-    font-size: 13px;
+    font-size: 11.5px;
     color: #1a1510;
-    line-height: 1.7;
+    line-height: 1.55;
     font-weight: 300;
   }
 
-  .inv-section-content strong { font-weight: 500; font-size: 15px; display: block; margin-bottom: 2px; }
+  .inv-section-content strong {
+    font-weight: 500;
+    font-size: 13.5px;
+    display: block;
+    margin-bottom: 2px;
+  }
 
-  .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+  }
 
   .inv-table thead tr {
     background: #1a1510;
@@ -829,78 +848,187 @@
   }
 
   .inv-table thead th {
-    padding: 10px 14px;
-    font-size: 9px;
-    letter-spacing: 3px;
+    padding: 7px 12px;
+    font-size: 8.5px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
     font-weight: 500;
-    text-align: left;
   }
 
+  .inv-table thead th:first-child { text-align: left; }
+  .inv-table thead th:nth-child(2) { text-align: center; }
+  .inv-table thead th:nth-child(3) { text-align: right; }
   .inv-table thead th:last-child { text-align: right; }
-  .inv-table thead th:nth-child(2),
-  .inv-table thead th:nth-child(3) { text-align: center; }
 
-  .inv-table tbody tr { border-bottom: 1px solid #e8e0d0; }
-  .inv-table tbody tr:last-child { border-bottom: none; }
+  .inv-table tbody tr {
+    border-bottom: 1px solid #ede5d8;
+  }
+  .inv-table tbody tr:last-child {
+    border-bottom: 1px solid #d4c8b8;
+  }
 
   .inv-table tbody td {
-    padding: 12px 14px;
-    font-size: 12px;
+    padding: 9px 12px;
+    font-size: 11.5px;
     color: #1a1510;
     font-weight: 300;
+    vertical-align: top !important;
   }
 
-  .inv-table tbody td.desc { font-size: 13px; }
-  .inv-table tbody td.sub-desc { font-size: 11px; color: #5a4a3a; }
+  .inv-table tbody td.desc {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1510;
+    line-height: 1.45;
+  }
 
-  .inv-table td:nth-child(2), .inv-table td:nth-child(3) { text-align: center; }
-  .inv-table td:last-child { text-align: right; font-weight: 400; }
+  .inv-table tbody td:first-child { text-align: left; }
+  .inv-table tbody td:nth-child(2) { text-align: center; font-weight: 400; }
+  .inv-table tbody td:nth-child(3) { text-align: right; font-weight: 400; }
+  .inv-table tbody td:last-child { text-align: right; font-weight: 500; }
 
-  .inv-table tfoot td { padding: 8px 14px; font-size: 13px; }
-  .inv-table tfoot .spacer { height: 10px; }
-  .inv-table tfoot tr { border-top: 1px solid #c8baa0; }
-  .inv-table tfoot .subtotal-label { text-align: right; color: #5a4a3a; font-size: 11px; letter-spacing: 1px; }
-  .inv-table tfoot .subtotal-amt { text-align: right; font-weight: 500; }
-  .inv-table tfoot .discount-label { text-align: right; color: #8B1A1A; font-size: 11px; letter-spacing: 1px; }
-  .inv-table tfoot .discount-amt { text-align: right; color: #8B1A1A; font-weight: 500; }
-  .inv-table tfoot .total-label { text-align: right; color: #5a4a3a; font-size: 11px; letter-spacing: 1px; }
-  .inv-table tfoot .total-amt { text-align: right; font-weight: 500; }
-  .inv-table tfoot .advance-label { text-align: right; color: #2a7a4a; font-size: 11px; }
-  .inv-table tfoot .advance-amt { text-align: right; color: #2a7a4a; font-weight: 500; }
-  .inv-table tfoot .balance-label { text-align: right; color: #8B1A1A; font-size: 11px; font-weight: 600; }
-  .inv-table tfoot .balance-amt { text-align: right; color: #8B1A1A; font-weight: 600; font-size: 16px; }
+  /* ── TABLE FOOTER (CLEAN TOTALS, NO EXCESS LINES) ── */
+  .inv-table tfoot {
+    border-top: none !important;
+  }
+
+  .inv-table tfoot tr {
+    border: none !important;
+  }
+
+  .inv-table tfoot td {
+    padding: 4px 12px;
+    font-size: 11.5px;
+    border: none !important;
+    vertical-align: middle;
+  }
+
+  .inv-table tfoot td.empty-col {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .inv-table tfoot .subtotal-label {
+    text-align: right;
+    color: #6b5a4d;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .inv-table tfoot .subtotal-amt {
+    text-align: right;
+    font-weight: 500;
+    color: #1a1510;
+  }
+
+  .inv-table tfoot .discount-label {
+    text-align: right;
+    color: #8B1A1A;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .inv-table tfoot .discount-amt {
+    text-align: right;
+    color: #8B1A1A;
+    font-weight: 500;
+  }
+
+  .inv-table tfoot .total-label {
+    text-align: right;
+    color: #1a1510;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+  .inv-table tfoot .total-amt {
+    text-align: right;
+    font-weight: 600;
+    font-size: 14px;
+    color: #1a1510;
+  }
+
+  .inv-table tfoot .advance-label {
+    text-align: right;
+    color: #2a7a4a;
+    font-size: 10.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .inv-table tfoot .advance-amt {
+    text-align: right;
+    color: #2a7a4a;
+    font-weight: 500;
+  }
+
+  .inv-table tfoot .balance-label {
+    text-align: right;
+    color: #8B1A1A;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .inv-table tfoot .balance-amt {
+    text-align: right;
+    color: #8B1A1A;
+    font-weight: 600;
+    font-size: 15.5px;
+  }
+
+  /* Specific border rules for visual hierarchy — applied ONLY to data columns, NEVER across empty left columns! */
+  .inv-table tfoot tr.tfoot-summary-start td:not(.empty-col) {
+    border-top: 1px solid #d4c8b8 !important;
+    padding-top: 8px;
+  }
+
+  .inv-table tfoot tr.tfoot-total td:not(.empty-col) {
+    border-top: 1px solid #1a1510 !important;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .inv-table tfoot tr.tfoot-balance td:not(.empty-col) {
+    border-top: 1.5px solid #8B1A1A !important;
+    border-bottom: 2px solid #8B1A1A !important;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    background: rgba(139, 26, 26, 0.02);
+  }
 
   .inv-footer {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    padding-top: 24px;
-    border-top: 1px solid #c8baa0;
-    font-size: 11px;
+    gap: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #d4c8b8;
+    font-size: 10.5px;
     color: #5a4a3a;
-    line-height: 1.7;
+    line-height: 1.55;
   }
 
   .inv-footer-label {
-    font-size: 8px;
-    letter-spacing: 0;
+    font-size: 7.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: #8B1A1A;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     font-weight: 600;
   }
 
   .inv-footer-since {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 16px;
-    border-top: 1px solid #e8e0d0;
-    font-size: 10px;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #ede5d8;
+    font-size: 8.5px;
     color: #8B1A1A;
-    letter-spacing: 2px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
-    font-weight: 300;
+    font-weight: 400;
+    line-height: 1.5;
   }
 
   /* Search / filter */
@@ -3022,13 +3150,13 @@ function getInvoiceHTML(d) {
   let rowsHtml = '';
   (d.rows || []).forEach(r => {
     const isIncluded = (r.rate === 0 || !r.rate) && (r.amt === 0 || !r.amt);
-    const subdescHtml = r.subdesc ? `<div style="font-size:10px;color:#8a7060;font-style:italic;margin-top:3px;line-height:1.5;">${String(r.subdesc).replace(/\n/g,'<br>')}</div>` : '';
+    const subdescHtml = r.subdesc ? `<div style="font-size:10px;color:#5a4a3a;margin-top:4px;line-height:1.55;font-weight:300;">${String(r.subdesc).replace(/\n/g,'<br>')}</div>` : '';
     rowsHtml += `
       <tr>
-        <td class="desc">${r.desc || ''}${subdescHtml}</td>
-        <td>${r.qty ?? 1}</td>
-        <td>${isIncluded ? 'Included' : ('Rs ' + fmtNum(r.rate || 0))}</td>
-        <td>${isIncluded ? '—' : ('Rs ' + fmtNum(r.amt || 0))}</td>
+        <td class="desc" style="vertical-align:top;text-align:left;">${r.desc || ''}${subdescHtml}</td>
+        <td style="vertical-align:top;text-align:center;">${r.qty ?? 1}</td>
+        <td style="vertical-align:top;text-align:right;">${isIncluded ? 'Included' : ('Rs ' + fmtNum(r.rate || 0))}</td>
+        <td style="vertical-align:top;text-align:right;font-weight:500;">${isIncluded ? '—' : ('Rs ' + fmtNum(r.amt || 0))}</td>
       </tr>
     `;
   });
@@ -3047,9 +3175,9 @@ function getInvoiceHTML(d) {
   return `
     <div class="inv-header">
       <div class="inv-brand">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-style:italic;font-weight:300;color:#1a1510;line-height:1;">Forever Films</div>
-        <div style="width:40px;height:1px;background:#8B1A1A;opacity:0.4;margin:8px 0;"></div>
-        <div style="font-size:10px;color:#8B1A1A;font-style:italic;margin-bottom:10px;">Capturing raw emotion since 2016</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-style:italic;font-weight:300;color:#1a1510;line-height:1;">Forever Films</div>
+        <div style="width:36px;height:1px;background:#8B1A1A;opacity:0.4;margin:6px 0;"></div>
+        <div style="font-size:9.5px;color:#8B1A1A;font-style:italic;margin-bottom:8px;">Capturing raw emotion since 2016</div>
         <div class="contact">
           +977 9768570000<br>
           www.foreverfilmsnepal.com<br>
@@ -3090,45 +3218,44 @@ function getInvoiceHTML(d) {
     <table class="inv-table">
       <thead>
         <tr>
-          <th style="width:48%;">Description</th>
-          <th style="width:8%;text-align:center;">QTY</th>
-          <th style="width:22%;text-align:center;">Rate (Rs)</th>
-          <th style="width:22%;text-align:right;">Amount (Rs)</th>
+          <th style="width:50%;text-align:left;">Description</th>
+          <th style="width:10%;text-align:center;">QTY</th>
+          <th style="width:20%;text-align:right;">Rate (Rs)</th>
+          <th style="width:20%;text-align:right;">Amount (Rs)</th>
         </tr>
       </thead>
       <tbody>${rowsHtml}</tbody>
       <tfoot>
-        <tr class="spacer"><td colspan="4" style="height:10px;border:none;"></td></tr>
         ${(d.discount && Number(d.discount) > 0) ? `
-        <tr>
-          <td colspan="2" style="border:none;"></td>
+        <tr class="tfoot-summary-start">
+          <td colspan="2" class="empty-col"></td>
           <td class="subtotal-label">Subtotal</td>
           <td class="subtotal-amt">Rs ${fmtNum(d.subtotal || ((d.total || 0) + (d.discount || 0)))}</td>
         </tr>
-        <tr>
-          <td colspan="2" style="border:none;"></td>
+        <tr class="tfoot-discount">
+          <td colspan="2" class="empty-col"></td>
           <td class="discount-label">Discount ${d.discountPct ? `(${d.discountPct}%)` : ''}</td>
           <td class="discount-amt">- Rs ${fmtNum(d.discount)}</td>
         </tr>
-        <tr>
-          <td colspan="2" style="border:none;"></td>
-          <td class="total-label" style="font-weight:600; font-size:12px;">Total Payable</td>
-          <td class="total-amt" style="font-weight:600; font-size:16px;">Rs ${fmtNum(d.total || 0)}</td>
+        <tr class="tfoot-total">
+          <td colspan="2" class="empty-col"></td>
+          <td class="total-label">Total Payable</td>
+          <td class="total-amt">Rs ${fmtNum(d.total || 0)}</td>
         </tr>
         ` : `
-        <tr>
-          <td colspan="2" style="border:none;"></td>
+        <tr class="tfoot-summary-start tfoot-total">
+          <td colspan="2" class="empty-col"></td>
           <td class="total-label">Total</td>
           <td class="total-amt">Rs ${fmtNum(d.total || 0)}</td>
         </tr>
         `}
-        <tr>
-          <td colspan="2" style="border:none;"></td>
+        <tr class="tfoot-advance">
+          <td colspan="2" class="empty-col"></td>
           <td class="advance-label">Advance</td>
           <td class="advance-amt">Rs ${fmtNum(d.advance || 0)}</td>
         </tr>
-        <tr>
-          <td colspan="2" style="border:none;"></td>
+        <tr class="tfoot-balance">
+          <td colspan="2" class="empty-col"></td>
           <td class="balance-label">Balance Due</td>
           <td class="balance-amt">Rs ${fmtNum(d.balance || 0)}</td>
         </tr>
@@ -3218,7 +3345,7 @@ async function generateInvoicePDF(d) {
     width: 794px;
     background: #ffffff;
     color: #1a1510;
-    padding: 48px;
+    padding: 38px 44px;
     box-sizing: border-box;
     font-family: 'Jost', sans-serif;
     z-index: 999990;
@@ -3281,21 +3408,30 @@ async function generateInvoicePDF(d) {
     const pdfW = pdf.internal.pageSize.getWidth();   // 210mm
     const pdfH = pdf.internal.pageSize.getHeight();  // 297mm
     const imgH = (canvas.height * pdfW) / canvas.width;
-    const imgData = canvas.toDataURL('image/jpeg', 0.96);
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
-    let heightLeft = imgH;
-    let position = 0;
+    // If invoice fits on 1 page or is within 15% overflow (up to 341mm),
+    // scale to fit cleanly on EXACTLY 1 page to guarantee ZERO stray blank pages
+    if (imgH <= pdfH * 1.15) {
+      const scale = Math.min(1, pdfH / imgH);
+      const fitW = pdfW * scale;
+      const fitH = imgH * scale;
+      const offsetX = (pdfW - fitW) / 2;
+      pdf.addImage(imgData, 'JPEG', offsetX, 0, fitW, fitH, undefined, 'FAST');
+    } else {
+      // For genuinely massive invoices with 8+ multi-line services spanning multiple full pages
+      let heightLeft = imgH;
+      let position = 0;
 
-    // Add first page
-    pdf.addImage(imgData, 'JPEG', 0, position, pdfW, imgH, undefined, 'FAST');
-    heightLeft -= pdfH;
-
-    // Slice across pages if the invoice exceeds standard A4 height
-    while (heightLeft > 2) {
-      position -= pdfH;
-      pdf.addPage();
       pdf.addImage(imgData, 'JPEG', 0, position, pdfW, imgH, undefined, 'FAST');
       heightLeft -= pdfH;
+
+      while (heightLeft > 12) { // 12mm threshold prevents accidental trailing page
+        position -= pdfH;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfW, imgH, undefined, 'FAST');
+        heightLeft -= pdfH;
+      }
     }
 
     const clientSlug = (d.clientName || 'Client').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
