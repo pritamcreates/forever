@@ -736,7 +736,7 @@
   .close-btn:hover { color: var(--cream); }
 
   /* ── INVOICE PRINT ── */
-  #invoice-print {
+  #invoice-print, #invoice-render-sandbox {
     background: #fff;
     color: #1a1510;
     padding: 50px;
@@ -3004,10 +3004,10 @@ function closePreview() {
   document.getElementById('preview-modal').classList.remove('open');
 }
 
-function renderInvoicePrint(d) {
+function getInvoiceHTML(d) {
+  if (!d) return '';
   // Build event dates display
   const eventDates = d.eventDates || [];
-  // fallback for old saved invoices that had eventStart/eventEnd
   let eventDatesMeta = '';
   if (eventDates.length > 0) {
     eventDatesMeta = eventDates.map(ed => {
@@ -3021,14 +3021,14 @@ function renderInvoicePrint(d) {
   // Build rows
   let rowsHtml = '';
   (d.rows || []).forEach(r => {
-    const isIncluded = r.rate === 0 && r.amt === 0;
-    const subdescHtml = r.subdesc ? `<div style="font-size:10px;color:#8a7060;font-style:italic;margin-top:3px;line-height:1.5;">${r.subdesc.replace(/\n/g,'<br>')}</div>` : '';
+    const isIncluded = (r.rate === 0 || !r.rate) && (r.amt === 0 || !r.amt);
+    const subdescHtml = r.subdesc ? `<div style="font-size:10px;color:#8a7060;font-style:italic;margin-top:3px;line-height:1.5;">${String(r.subdesc).replace(/\n/g,'<br>')}</div>` : '';
     rowsHtml += `
       <tr>
-        <td class="desc">${r.desc}${subdescHtml}</td>
-        <td>${r.qty}</td>
-        <td>${isIncluded ? 'Included' : ('Rs ' + fmtNum(r.rate))}</td>
-        <td>${isIncluded ? '—' : ('Rs ' + fmtNum(r.amt))}</td>
+        <td class="desc">${r.desc || ''}${subdescHtml}</td>
+        <td>${r.qty ?? 1}</td>
+        <td>${isIncluded ? 'Included' : ('Rs ' + fmtNum(r.rate || 0))}</td>
+        <td>${isIncluded ? '—' : ('Rs ' + fmtNum(r.amt || 0))}</td>
       </tr>
     `;
   });
@@ -3044,7 +3044,7 @@ function renderInvoicePrint(d) {
     daysHtml = d.eventDays.split('\n').map(l => l ? `<div>${l}</div>` : '').join('');
   }
 
-  document.getElementById('invoice-print').innerHTML = `
+  return `
     <div class="inv-header">
       <div class="inv-brand">
         <div style="font-family:'Cormorant Garamond',serif;font-size:38px;font-style:italic;font-weight:300;color:#1a1510;line-height:1;">Forever Films</div>
@@ -3074,7 +3074,7 @@ function renderInvoicePrint(d) {
           <strong>${d.clientName || '—'}</strong>
           ${d.clientPhone ? d.clientPhone + '<br>' : ''}
           ${d.clientEmail ? d.clientEmail + '<br>' : ''}
-          ${d.clientAddr || ''}
+          ${d.clientAddr ? String(d.clientAddr).replace(/\n/g, '<br>') : ''}
         </div>
       </div>
       <div>
@@ -3099,11 +3099,11 @@ function renderInvoicePrint(d) {
       <tbody>${rowsHtml}</tbody>
       <tfoot>
         <tr class="spacer"><td colspan="4" style="height:10px;border:none;"></td></tr>
-        ${(d.discount && d.discount > 0) ? `
+        ${(d.discount && Number(d.discount) > 0) ? `
         <tr>
           <td colspan="2" style="border:none;"></td>
           <td class="subtotal-label">Subtotal</td>
-          <td class="subtotal-amt">Rs ${fmtNum(d.subtotal || (d.total + d.discount))}</td>
+          <td class="subtotal-amt">Rs ${fmtNum(d.subtotal || ((d.total || 0) + (d.discount || 0)))}</td>
         </tr>
         <tr>
           <td colspan="2" style="border:none;"></td>
@@ -3113,24 +3113,24 @@ function renderInvoicePrint(d) {
         <tr>
           <td colspan="2" style="border:none;"></td>
           <td class="total-label" style="font-weight:600; font-size:12px;">Total Payable</td>
-          <td class="total-amt" style="font-weight:600; font-size:16px;">Rs ${fmtNum(d.total)}</td>
+          <td class="total-amt" style="font-weight:600; font-size:16px;">Rs ${fmtNum(d.total || 0)}</td>
         </tr>
         ` : `
         <tr>
           <td colspan="2" style="border:none;"></td>
           <td class="total-label">Total</td>
-          <td class="total-amt">Rs ${fmtNum(d.total)}</td>
+          <td class="total-amt">Rs ${fmtNum(d.total || 0)}</td>
         </tr>
         `}
         <tr>
           <td colspan="2" style="border:none;"></td>
           <td class="advance-label">Advance</td>
-          <td class="advance-amt">Rs ${fmtNum(d.advance)}</td>
+          <td class="advance-amt">Rs ${fmtNum(d.advance || 0)}</td>
         </tr>
         <tr>
           <td colspan="2" style="border:none;"></td>
           <td class="balance-label">Balance Due</td>
-          <td class="balance-amt">Rs ${fmtNum(d.balance)}</td>
+          <td class="balance-amt">Rs ${fmtNum(d.balance || 0)}</td>
         </tr>
       </tfoot>
     </table>
@@ -3157,96 +3157,187 @@ function renderInvoicePrint(d) {
   `;
 }
 
-// ─── QUICK PDF DOWNLOAD (from invoice list, no modal) ────────────
-async function quickDownloadPDF(id) {
-  const invs = await getInvoices();
-  const inv = invs.find(i => i.id === id);
-  if (!inv) { showToast('Invoice not found'); return; }
-
-  showToast('Generating PDF…');
-
-  // Render into the hidden invoice-print div temporarily
-  previewData = inv;
-  renderInvoicePrint(inv);
-
-  // Brief delay to allow render, then capture
-  await new Promise(r => setTimeout(r, 120));
-
+function renderInvoicePrint(d) {
   const el = document.getElementById('invoice-print');
-  const { jsPDF } = window.jspdf;
-
-  try {
-    const canvas = await html2canvas(el, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false
-    });
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
-    const imgH = (canvas.height * pdfW) / canvas.width;
-
-    let y = 0;
-    let remaining = imgH;
-    while (remaining > 0) {
-      pdf.addImage(imgData, 'JPEG', 0, -y, pdfW, imgH);
-      remaining -= pdfH;
-      y += pdfH;
-      if (remaining > 0) pdf.addPage();
-    }
-
-    const client = (inv.clientName || 'Client').replace(/\s+/g, '_');
-    const invNo = inv.invNo || 'Invoice';
-    pdf.save(`${invNo}_${client}_ForeverFilms.pdf`);
-    showToast('✓ PDF downloaded');
-  } catch(err) {
-    console.error(err);
-    showToast('Error generating PDF');
+  if (el) {
+    el.innerHTML = getInvoiceHTML(d);
   }
 }
 
-// ─── PDF DOWNLOAD ────────────────────────────────────────────────
-async function downloadPDF() {
-  const el = document.getElementById('invoice-print');
-  const { jsPDF } = window.jspdf;
+// ─── ROBUST PDF GENERATION ────────────────────────────────────────
+async function generateInvoicePDF(d) {
+  if (!d) {
+    showToast('No invoice data available');
+    return;
+  }
 
-  showToast('Generating PDF...');
+  // Update in-page preview so print preview matches
+  previewData = d;
+  renderInvoicePrint(d);
+
+  // High-end loading overlay to mask offscreen rendering and give visual feedback
+  const loadingOverlay = document.createElement('div');
+  loadingOverlay.id = 'pdf-loading-overlay';
+  loadingOverlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 10, 8, 0.90);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 999998;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #f5f0e8;
+    font-family: 'Jost', sans-serif;
+  `;
+  loadingOverlay.innerHTML = `
+    <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-style:italic;color:#C4A052;margin-bottom:12px;">Forever Films</div>
+    <div style="display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(245,240,232,0.85);">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4A052" stroke-width="2" style="animation:ffSpin 1s linear infinite;">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+        <path d="M12 2a10 10 0 0 1 10 10"/>
+      </svg>
+      Generating Invoice PDF…
+    </div>
+    <div style="font-size:10px;color:rgba(245,240,232,0.4);margin-top:8px;letter-spacing:1px;">Rendering high-resolution document</div>
+    <style>
+      @keyframes ffSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+  `;
+  document.body.appendChild(loadingOverlay);
+
+  // Dedicated offscreen sandbox mounted at top:0, left:0 behind the backdrop
+  const sandbox = document.createElement('div');
+  sandbox.id = 'invoice-render-sandbox';
+  sandbox.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 794px;
+    background: #ffffff;
+    color: #1a1510;
+    padding: 48px;
+    box-sizing: border-box;
+    font-family: 'Jost', sans-serif;
+    z-index: 999990;
+    opacity: 1;
+    pointer-events: none;
+    transform: none;
+    animation: none;
+    transition: none;
+    overflow: visible;
+  `;
+  sandbox.innerHTML = getInvoiceHTML(d);
+  document.body.appendChild(sandbox);
 
   try {
-    const canvas = await html2canvas(el, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false
-    });
-
-    const imgData = canvas.toDataURL('image/jpeg', 0.95);
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-    const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
-    const imgH = (canvas.height * pdfW) / canvas.width;
-
-    let y = 0;
-    let remaining = imgH;
-
-    while (remaining > 0) {
-      pdf.addImage(imgData, 'JPEG', 0, -y, pdfW, imgH);
-      remaining -= pdfH;
-      y += pdfH;
-      if (remaining > 0) pdf.addPage();
+    // Ensure all web fonts are loaded and rendered
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
     }
 
-    const client = previewData?.clientName?.replace(/\s+/g, '_') || 'Client';
-    const invNo = previewData?.invNo || 'Invoice';
-    pdf.save(`${invNo}_${client}_ForeverFilms.pdf`);
-    showToast('✓ PDF downloaded');
-  } catch(err) {
-    console.error(err);
-    showToast('Error generating PDF — try printing instead');
+    // Brief layout stabilization
+    await new Promise(r => setTimeout(r, 160));
+
+    const sandboxW = sandbox.offsetWidth || 794;
+    const sandboxH = sandbox.offsetHeight || 1123;
+
+    // Capture using html2canvas with explicit bounds and 2x scale
+    const canvas = await html2canvas(sandbox, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0,
+      width: sandboxW,
+      height: sandboxH,
+      windowWidth: sandboxW,
+      windowHeight: sandboxH
+    });
+
+    if (!canvas || !canvas.width || !canvas.height) {
+      throw new Error('Canvas render returned empty or 0 dimensions');
+    }
+
+    const jspdfModule = window.jspdf;
+    const jsPDF = jspdfModule?.jsPDF || window.jsPDF;
+    if (!jsPDF) {
+      throw new Error('jsPDF library is not loaded');
+    }
+
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+      compress: true
+    });
+
+    const pdfW = pdf.internal.pageSize.getWidth();   // 210mm
+    const pdfH = pdf.internal.pageSize.getHeight();  // 297mm
+    const imgH = (canvas.height * pdfW) / canvas.width;
+    const imgData = canvas.toDataURL('image/jpeg', 0.96);
+
+    let heightLeft = imgH;
+    let position = 0;
+
+    // Add first page
+    pdf.addImage(imgData, 'JPEG', 0, position, pdfW, imgH, undefined, 'FAST');
+    heightLeft -= pdfH;
+
+    // Slice across pages if the invoice exceeds standard A4 height
+    while (heightLeft > 2) {
+      position -= pdfH;
+      pdf.addPage();
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfW, imgH, undefined, 'FAST');
+      heightLeft -= pdfH;
+    }
+
+    const clientSlug = (d.clientName || 'Client').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    const invNoSlug = (d.invNo || 'Invoice').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    const filename = `${invNoSlug}_${clientSlug}_ForeverFilms.pdf`;
+
+    pdf.save(filename);
+    showToast('✓ PDF downloaded successfully');
+  } catch (err) {
+    console.error('PDF Generation Error:', err);
+    showToast('PDF export issue — opening print preview…');
+    setTimeout(() => {
+      window.print();
+    }, 400);
+  } finally {
+    if (sandbox && sandbox.parentNode) {
+      sandbox.parentNode.removeChild(sandbox);
+    }
+    if (loadingOverlay && loadingOverlay.parentNode) {
+      loadingOverlay.parentNode.removeChild(loadingOverlay);
+    }
   }
+}
+
+// ─── QUICK PDF DOWNLOAD (from invoice list) ──────────────────────
+async function quickDownloadPDF(id) {
+  const invs = await getInvoices();
+  const inv = invs.find(i => i.id === id);
+  if (!inv) {
+    showToast('Invoice not found');
+    return;
+  }
+  await generateInvoicePDF(inv);
+}
+
+// ─── PDF DOWNLOAD (from preview modal) ───────────────────────────
+async function downloadPDF() {
+  if (!previewData) {
+    showToast('No invoice preview available');
+    return;
+  }
+  await generateInvoicePDF(previewData);
 }
 
 // ─── EXPENSES & FREELANCERS ─────────────────────────────────────
